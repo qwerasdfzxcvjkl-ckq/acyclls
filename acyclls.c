@@ -18,7 +18,14 @@ enum {
 	FINAL,
 };
 
-void
+
+static void 
+usage(const char *prog)
+{
+	fprintf(stderr, "Usage: %s <num_layouts>\nnum_layouts: integer >= 3\n", prog);
+}
+
+static void
 write_event_with_delay_and_syn(const struct input_event *event)
 {
 	const int delay = 20000;
@@ -28,7 +35,7 @@ write_event_with_delay_and_syn(const struct input_event *event)
 }
 
 int 
-main(void) 
+main(int argc, char **argv) 
 {
 	setbuf(stdin, NULL), setbuf(stdout, NULL);
 
@@ -36,7 +43,27 @@ main(void)
 	int alt_left_held = 0;
 	int used = 0;
 	int lused = 1;
-	int num_of_layouts = 3;
+	int num_of_layouts = 0;
+
+	if (argc != 2) {
+		usage(argv[0]);
+		return 1;
+	}
+
+	char *end = NULL;
+	num_of_layouts = (int) strtol(argv[1], &end, 10);
+
+	if (end == argv[1] || *end != '\0') {
+		fprintf(stderr, "Invalid num_layouts: '%s'\n", argv[1]);
+		usage(argv[0]);
+		return 1;
+	}
+
+	if (num_of_layouts < 3) {
+		fprintf(stderr, "num_layouts must be >= 3 (got %d)\n", num_of_layouts);
+		usage(argv[0]);
+		return 1;
+	}
 
 
 	int state = START;
